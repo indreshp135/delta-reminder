@@ -3,7 +3,10 @@ import mongoose, {model} from 'mongoose'
 const userSchema = new mongoose.Schema({
     name: {
         type: String
-    }
+    },
+    closedNotif: [{
+        type: String
+    }]
 }) 
 
 const eventSchema = new mongoose.Schema({
