@@ -1,10 +1,13 @@
-import mongoose, {model} from 'mongoose'
+const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
     name: {
         type: String
     },
     closedNotif: [{
+        type: String
+    }],
+    privateEvents: [{
         type: String
     }]
 }) 
@@ -14,7 +17,7 @@ const eventSchema = new mongoose.Schema({
         type: String
     },
     deadline: {
-        type: Date
+        type: String
     },
     createdBy: {
         type: String
@@ -23,7 +26,8 @@ const eventSchema = new mongoose.Schema({
         type: String
     },
     isPublic: {
-        type: Boolean
+        type: Boolean,
+        default: false
     }
 
 })
