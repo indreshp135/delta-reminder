@@ -1,20 +1,20 @@
 {
-    "manifest_version":2,
-    "name":"Set Remainder",
-    "version":"1.0",
-    "description":"Copy a text and set it as remainder through google calender",
-    "icons":{
-        "128":"icon128.png",
-        "48":"icon48.png",
-        "16":"icon16.png"
-    },
-    "browser_action":{
-        "default_icon":"icon16.png",
-        "default_popup":"popup.html"
-    },
-    "background": {
-        "scripts": ["eventPage.js"],
-        "persistent": false
-    },
-    "permissions":["notifications","contextMenus","tabs"]
+	"manifest_version": 2,
+	"name": "Delta Notification",
+	"version": "1.0",
+	"description": "Copy a text and set it as remainder through google calender",
+	"icons": {
+		"128": "icon128.png",
+		"48": "icon48.png",
+		"16": "icon16.png"
+	},
+	"browser_action": {
+		"default_icon": "icon16.png",
+		"default_popup": "popup.html"
+	},
+	"background": {
+		"scripts": ["eventPage.js"],
+		"persistent": false
+	},
+	"permissions": ["storage", "notifications", "contextMenus", "tabs"]
 }
