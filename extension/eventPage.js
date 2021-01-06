@@ -11,7 +11,7 @@ chrome.storage.sync.get('olddate', (fetch) => {
                     notifications = data
                     var notifOptions = {
                         type: "basic",
-                        iconUrl: "icon48.png",
+                        iconUrl: "icon/icon48.png",
                         title: "Remainders from delta",
                         message: `You have ${notifications.length} remaining to be marked as read.`,
                         isClickable: true,
@@ -19,7 +19,7 @@ chrome.storage.sync.get('olddate', (fetch) => {
                     chrome.notifications.create('remind', notifOptions);
                     chrome.notifications.onClicked.addListener(() => {
                         chrome.tabs.create({
-                            url: 'https://jsonplaceholder.typicode.com/posts', //changes required
+                            url: `${backend}/events`, //changes required
                             active: true
                         }, function(tab) {
                             chrome.windows.create({
