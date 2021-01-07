@@ -20,6 +20,11 @@ app.use(function(req, res, next) {
     next();
 });
 
+//EJS
+app.set('views', path.join(__dirname, 'views'));
+app.engine('html', require('ejs').renderFile);
+app.set('view engine','ejs');
+
 const PORT = process.env.PORT || 8000
 
 const mongoKeys = require('./config/keys.js')
