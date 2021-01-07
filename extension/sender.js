@@ -1,6 +1,8 @@
 $(function() {
+
+    backend = 'https://localhost:8000'
+
     chrome.storage.sync.get('content', (res) => {
-        console.log(res.content)
         $("#content").val(res.content);
     })
 
@@ -31,6 +33,7 @@ $(function() {
                 const name = $("#name").value
                 const date = $("#date").value
                 const content = $("#content").value
+                console.log(url, isPublic, user, name, date, content)
                 $.post(`${backend}/event`, { url, isPublic, user, name, date, content }) //changes required
                     .done(data => console.log({ data, url, isPublic, user, name, date, content }))
                     .fail((xhr, status) => console.log('error:', status));
