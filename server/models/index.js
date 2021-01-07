@@ -28,6 +28,9 @@ const eventSchema = new mongoose.Schema({
     isPublic: {
         type: Boolean,
         default: false
+    },
+    url: {
+        type: String
     }
 
 })

@@ -14,7 +14,7 @@ mongoose.connect(`mongodb+srv://${mongoKeys.username}:${mongoKeys.password}@clus
     () => console.log('Connection to MongoDB successful')
 )
 
-app.get('/events', (req, res) => {
+app.get('/event', (req, res) => {
     Event.find({})
     .then(eventsList => {
         var events = []
@@ -26,7 +26,7 @@ app.get('/events', (req, res) => {
     .catch(err => res.status(400).send('Error'))
 })
 
-app.get('/events/:eventId', (req, res) => {
+app.get('/event/:eventId', (req, res) => {
     Event.findById(req.params.eventId)
     .then(event => {
         if(event) res.send(event)
@@ -35,12 +35,9 @@ app.get('/events/:eventId', (req, res) => {
     .catch(err => res.status(400).send('Error'))
 })
 
-// app.post('/events', (req, res) => {
-
-// })
-
-// app.post('/events/:userId', (req, res) => {
-
-// })
+app.post('/event', (req, res) => {
+    console.log(req)
+    res.send('sent')
+})
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`))
