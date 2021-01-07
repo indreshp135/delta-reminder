@@ -25,11 +25,10 @@ const PORT = process.env.PORT || 8000
 const mongoKeys = require('./config/keys.js')
 
 mongoose.connect(`mongodb+srv://${mongoKeys.username}:${mongoKeys.password}@cluster0.bt4sv.mongodb.net/eventTracker?retryWrites=true&w=majority&ssl=true`, { useNewUrlParser: true, useUnifiedTopology: true },
-    () => console.log('Connection to MongoDB successful')
-)
-
+        () => console.log('Connection to MongoDB successful')
+    )
+    //return all events
 app.get('/event', (req, res) => {
-    console.log(req.body);
     Event.find({})
         .then(eventsList => {
             var events = []
@@ -41,6 +40,45 @@ app.get('/event', (req, res) => {
         .catch(err => res.status(400).send('Error'))
 })
 
+//List events specific to the user
+app.get('/event/:user/:rollno', async(req, res) => {
+    Event.find({})
+        .then(eventsList => {
+            var events = []
+            const user = await User.findOne({ name: req.params.user, rollno: req.params.rollno })
+            events = eventsList.filter((event) => {
+                return parseInt(event.deadline) > Date.now() &&
+                    (event.isPublic || user.privateEvents.includes(event.id)) &&
+                    !user.closedNotif.includes(event.id)
+            })
+            res.render('events.ejs', { events, name: user.name, rollno: user.rollno })
+        })
+        .catch(err => res.status(400).send('Error'))
+})
+
+//Mark read route
+app.delete('/event/:user/:rollno', (req, res) => {
+    User.findOneAndUpdate({ name: req.body.name, rollno: req.body.rollno }, { $push: { closedNotif: req.body.notifid } }, (error) => {
+        if (error) {
+            console.log(error);
+            res.send('error' + error)
+        } else {
+            Event.find({})
+                .then(eventsList => {
+                    var events = []
+                    const user = await User.findOne({ name: req.body.user, rollno: req.body.rollno })
+                    events = eventsList.filter((event) => {
+                        return parseInt(event.deadline) > Date.now() &&
+                            (event.isPublic || user.privateEvents.includes(event.id)) &&
+                            !user.closedNotif.includes(event.id)
+                    })
+                    res.render('events.ejs', { events, name: user.name, rollno: user.rollno })
+                })
+                .catch(err => res.status(400).send('Error'))
+        }
+    })
+})
+
 app.get('/event/:eventId', (req, res) => {
     Event.findById(req.params.eventId)
         .then(event => {
@@ -50,9 +88,10 @@ app.get('/event/:eventId', (req, res) => {
         .catch(err => res.status(400).send('Error'))
 })
 
+//create a event
 app.post('/event', async(req, res) => {
     console.log(req.body)
-    const user = await User.findOne({ name: req.body.user })
+    const user = await User.findOne({ name: req.body.user, rollno: req.body.rollno })
     var event = new Event({
         name: req.body.name,
         isPublic: req.body.isPublic,
@@ -61,10 +100,14 @@ app.post('/event', async(req, res) => {
         url: req.body.url,
         createdBy: 1,
     })
-    await event.save()
+    const saved_event = await event.save()
+    if (!isPublic) {
+        await User.findByIdAndUpdate({ name: req.body.user }, { $push: { privateEvents: saved_event._id } })
+    }
     res.send('sent')
 })
 
+//create a user
 app.post('/add/user', async(req, res) => {
     console.log(req.body)
     await User.findOne({ rollno: req.body.rollno }, async(error, user) => {

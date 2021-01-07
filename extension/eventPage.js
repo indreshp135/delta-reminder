@@ -1,6 +1,6 @@
 var date = null;
 var backend = "https://localhost:8000"
-chrome.storage.sync.get('olddate', (fetch) => {
+chrome.storage.sync.get(['olddate', 'name', 'rollno'], (fetch) => {
     date = new Date(fetch.olddate)
     if (Date.now() - date > 8640) {
         chrome.storage.sync.set({ olddate: Date.now() }, () => {
@@ -19,7 +19,7 @@ chrome.storage.sync.get('olddate', (fetch) => {
                     chrome.notifications.create('remind', notifOptions);
                     chrome.notifications.onClicked.addListener(() => {
                         chrome.tabs.create({
-                            url: `${backend}/events`, //changes required
+                            url: `${backend}/events/${fetch.name}/${fetch.rollno}`,
                             active: true
                         }, function(tab) {
                             chrome.windows.create({
