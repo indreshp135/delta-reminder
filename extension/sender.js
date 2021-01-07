@@ -1,6 +1,6 @@
 $(function() {
 
-    backend = 'https://localhost:8000'
+    backend = 'http://localhost:8000'
 
     chrome.storage.sync.get(['content', 'url'], (res) => {
         $("#content").val(res.content);
