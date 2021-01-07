@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const bodyParser = require('body-parser')
-
+const path = require('path')
 const mongoose = require('mongoose')
 
 const { User, Event } = require('./models/index.js')
@@ -23,16 +23,17 @@ app.use(function(req, res, next) {
 //EJS
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
-app.set('view engine','ejs');
+app.set('view engine', 'ejs');
 
 const PORT = process.env.PORT || 8000
 
 const mongoKeys = require('./config/keys.js')
 
 mongoose.connect(`mongodb+srv://${mongoKeys.username}:${mongoKeys.password}@cluster0.bt4sv.mongodb.net/eventTracker?retryWrites=true&w=majority&ssl=true`, { useNewUrlParser: true, useUnifiedTopology: true },
-        () => console.log('Connection to MongoDB successful')
-    )
-    //return all events
+    () => console.log('Connection to MongoDB successful')
+)
+
+//return all events
 app.get('/event', (req, res) => {
     Event.find({})
         .then(eventsList => {
@@ -46,13 +47,13 @@ app.get('/event', (req, res) => {
 })
 
 //List events specific to the user
-app.get('/event/:user/:rollno', async(req, res) => {
+app.get('/events/:user/:rollno', async(req, res) => {
     Event.find({})
-        .then(eventsList => {
+        .then(async eventsList => {
             var events = []
             const user = await User.findOne({ name: req.params.user, rollno: req.params.rollno })
             events = eventsList.filter((event) => {
-                return parseInt(event.deadline) > Date.now() &&
+                return event.deadline ? parseInt(event.deadline) > Date.now() : true &&
                     (event.isPublic || user.privateEvents.includes(event.id)) &&
                     !user.closedNotif.includes(event.id)
             })
@@ -61,15 +62,31 @@ app.get('/event/:user/:rollno', async(req, res) => {
         .catch(err => res.status(400).send('Error'))
 })
 
+//fetch events length for notification
+app.get('/fetchevents/:user/:rollno', async(req, res) => {
+    Event.find({})
+        .then(async eventsList => {
+            var events = []
+            const user = await User.findOne({ name: req.params.user, rollno: req.params.rollno })
+            events = eventsList.filter((event) => {
+                return event.deadline ? parseInt(event.deadline) > Date.now() : true &&
+                    (event.isPublic || user.privateEvents.includes(event.id)) &&
+                    !user.closedNotif.includes(event.id)
+            })
+            res.status(200).send(`${events.length}`)
+        })
+        .catch(err => res.status(400).send('Error'))
+})
+
 //Mark read route
-app.delete('/event/:user/:rollno', (req, res) => {
+app.delete('/events/:user/:rollno', (req, res) => {
     User.findOneAndUpdate({ name: req.body.name, rollno: req.body.rollno }, { $push: { closedNotif: req.body.notifid } }, (error) => {
         if (error) {
             console.log(error);
             res.send('error' + error)
         } else {
             Event.find({})
-                .then(eventsList => {
+                .then(async eventsList => {
                     var events = []
                     const user = await User.findOne({ name: req.body.user, rollno: req.body.rollno })
                     events = eventsList.filter((event) => {
@@ -95,7 +112,6 @@ app.get('/event/:eventId', (req, res) => {
 
 //create a event
 app.post('/event', async(req, res) => {
-    console.log(req.body)
     const user = await User.findOne({ name: req.body.user, rollno: req.body.rollno })
     var event = new Event({
         name: req.body.name,
@@ -103,18 +119,17 @@ app.post('/event', async(req, res) => {
         description: req.body.content,
         deadline: req.body.date,
         url: req.body.url,
-        createdBy: 1,
+        createdBy: user._id,
     })
     const saved_event = await event.save()
-    if (!isPublic) {
-        await User.findByIdAndUpdate({ name: req.body.user }, { $push: { privateEvents: saved_event._id } })
+    if (!saved_event.isPublic) {
+        await User.findOneAndUpdate({ name: req.body.user }, { $push: { privateEvents: saved_event._id } })
     }
     res.send('sent')
 })
 
 //create a user
 app.post('/add/user', async(req, res) => {
-    console.log(req.body)
     await User.findOne({ rollno: req.body.rollno }, async(error, user) => {
         if (user) {
             console.log("User already exists")
@@ -126,6 +141,7 @@ app.post('/add/user', async(req, res) => {
                 rollno: req.body.rollno
             })
             await user_name.save()
+            console.log('User created successfully')
             res.send('User created successfully')
         }
     })

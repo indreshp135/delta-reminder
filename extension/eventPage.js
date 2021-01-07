@@ -1,33 +1,35 @@
 var date = null;
-var backend = "https://localhost:8000"
+var backend = "http://localhost:8000"
 chrome.storage.sync.get(['olddate', 'name', 'rollno'], (fetch) => {
     date = new Date(fetch.olddate)
-    if (Date.now() - date > 8640) {
+    if (!fetch.olddate || Date.now() - date > 8640) {
         chrome.storage.sync.set({ olddate: Date.now() }, () => {
             var notifications;
             console.log(date);
-            $.get(`${backend}/events`)
+            $.get(`${backend}/fetchevents/${fetch.name}/${fetch.rollno}`)
                 .done(data => {
-                    notifications = data
-                    var notifOptions = {
-                        type: "basic",
-                        iconUrl: "icon/icon48.png",
-                        title: "Remainders from delta",
-                        message: `You have ${notifications.length} remaining to be marked as read.`,
-                        isClickable: true,
-                    };
-                    chrome.notifications.create('remind', notifOptions);
-                    chrome.notifications.onClicked.addListener(() => {
-                        chrome.tabs.create({
-                            url: `${backend}/events/${fetch.name}/${fetch.rollno}`,
-                            active: true
-                        }, function(tab) {
-                            chrome.windows.create({
-                                tabId: tab.id,
-                                focused: true
+                    notifications_length = data
+                    if (notifications_length) {
+                        var notifOptions = {
+                            type: "basic",
+                            iconUrl: "icon/icon48.png",
+                            title: "Remainders from delta",
+                            message: `You have ${notifications_length} remaining to be marked as read.`,
+                            isClickable: true,
+                        };
+                        chrome.notifications.create('remind', notifOptions);
+                        chrome.notifications.onClicked.addListener(() => {
+                            chrome.tabs.create({
+                                url: `${backend}/events/${fetch.name}/${fetch.rollno}`,
+                                active: true
+                            }, function(tab) {
+                                chrome.windows.create({
+                                    tabId: tab.id,
+                                    focused: true
+                                });
                             });
-                        });
-                    })
+                        })
+                    }
                 })
                 .fail((xhr, status) => console.log('error:', status));
         })

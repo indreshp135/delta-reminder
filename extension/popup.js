@@ -5,6 +5,7 @@ $(function() {
             console.log(user);
             $("#helloMessage").text("Hello " + user.name);
             document.getElementById("formDiv").innerHTML = "";
+            $('a').attr("href", `${backend}/${user.name}/${user.rollno}`)
         }
     });
 
