@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+    nodeserver:
+        build: .
+        restart: always
+        container_name: deltaReminderServer
+        ports:
+            - 8000:8000
+        volumes:
+            - .:/usr/src/app

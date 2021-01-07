@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2,
+	"name": "Delta Remainder",
+	"version": "1.0",
+	"description": "Copy a text and set it as remainder through google calender",
+	"icons": {
+		"128": "icon/icon128.png",
+		"48": "icon/icon48.png",
+		"16": "icon/icon16.png"
+	},
+	"browser_action": {
+		"default_icon": "icon/icon16.png",
+		"default_popup": "popup.html"
+	},
+	"background": {
+		"scripts": ["eventPage.js", "junk/jquery.min.js"],
+		"persistent": true
+	},
+	"permissions": [
+		"notifications",
+		"contextMenus",
+		"tabs",
+		"storage",
+		"management"
+	]
+}
