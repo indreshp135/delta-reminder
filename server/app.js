@@ -50,9 +50,37 @@ app.get('/event/:eventId', (req, res) => {
         .catch(err => res.status(400).send('Error'))
 })
 
-app.post('/event', (req, res) => {
+app.post('/event', async(req, res) => {
     console.log(req.body)
+    const user = await User.findOne({ name: req.body.user })
+    var event = new Event({
+        name: req.body.name,
+        isPublic: req.body.isPublic,
+        description: req.body.content,
+        deadline: req.body.date,
+        url: req.body.url,
+        createdBy: 1,
+    })
+    await event.save()
     res.send('sent')
+})
+
+app.post('/add/user', async(req, res) => {
+    console.log(req.body)
+    await User.findOne({ rollno: req.body.rollno }, async(error, user) => {
+        if (user) {
+            console.log("User already exists")
+            res.send("User already exists")
+        }
+        if (!user) {
+            const user_name = new User({
+                name: req.body.name,
+                rollno: req.body.rollno
+            })
+            await user_name.save()
+            res.send('User created successfully')
+        }
+    })
 })
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`))

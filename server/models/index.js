@@ -4,13 +4,16 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String
     },
+    rollno: {
+        type: String
+    },
     closedNotif: [{
         type: String
     }],
     privateEvents: [{
         type: String
     }]
-}) 
+})
 
 const eventSchema = new mongoose.Schema({
     name: {
@@ -20,7 +23,7 @@ const eventSchema = new mongoose.Schema({
         type: String
     },
     createdBy: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId
     },
     description: {
         type: String
