@@ -1,12 +1,12 @@
 var date = null;
-
+var backend = "https://localhost:8000"
 chrome.storage.sync.get('olddate', (fetch) => {
     date = new Date(fetch.olddate)
-    if (Date.now() - date > 8640) { //changes required
+    if (Date.now() - date > 8640) {
         chrome.storage.sync.set({ olddate: Date.now() }, () => {
             var notifications;
             console.log(date);
-            $.get('https://jsonplaceholder.typicode.com/posts') //changes required
+            $.get(`${backend}/events`)
                 .done(data => {
                     notifications = data
                     var notifOptions = {
@@ -55,13 +55,13 @@ chrome.contextMenus.onClicked.addListener(function(clickData) {
             chrome.storage.sync.set({ url: tabs[0].url })
         });
         chrome.storage.sync.set({ content: clickData.selectionText })
-        window.open("toDelta.html", "extension_popup", "width=500,height=400,status=no,scrollbars=yes,resizable=no")
+        window.open("toDelta.html", "extension_popup", "width=500,height=500,status=no,scrollbars=yes,resizable=no")
     }
     if (clickData.menuItemId == "Personal" && clickData.selectionText) {
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
             chrome.storage.sync.set({ url: tabs[0].url })
         });
         chrome.storage.sync.set({ content: clickData.selectionText })
-        window.open("Personal.html", "extension_popup", "width=500,height=400,status=no,scrollbars=yes,resizable=no")
+        window.open("Personal.html", "extension_popup", "width=500,height=500,status=no,scrollbars=yes,resizable=no")
     }
 });
