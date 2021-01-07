@@ -19,7 +19,7 @@ $(function() {
             const content = $("#content").val()
             console.log({ url, isPublic, user, name, date, content })
             $.post(`${backend}/event`, { url, isPublic, user, name, date, content, rollno })
-                .done(data => console.log({ data, url, isPublic, user, name, date, content }))
+                .done(data =>  window.close())
                 .fail((xhr, status) => console.log('error:', status));
         })
     })
@@ -34,9 +34,8 @@ $(function() {
             const date = $("#date").val()
             const rollno = result.rollno;
             const content = $("#content").val()
-            console.log({ url, isPublic, user, name, date, content })
             $.post(`${backend}/event`, { url, isPublic, user, name, date, content, rollno }) //changes required
-                .done(data => console.log({ data, url, isPublic, user, name, date, content }))
+                .done(data =>  window.close())
                 .fail((xhr, status) => console.log('error:', status));
         })
     })

@@ -1,3 +1,0 @@
-events.ejs file to list all events specific to user
-
-Authentication for user
