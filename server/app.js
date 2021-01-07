@@ -29,7 +29,7 @@ const PORT = process.env.PORT || 8000
 
 const mongoKeys = require('./config/keys.js')
 
-mongoose.connect(mongoKeys.fullString||`mongodb+srv://${mongoKeys.username}:${mongoKeys.password}@cluster0.bt4sv.mongodb.net/eventTracker?retryWrites=true&w=majority&ssl=true`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+mongoose.connect('mongodb+srv://Indresh:touchmate1@cluster0.lcnof.mongodb.net/events?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
     .then(() => console.log("Connected to MongoDB"))
     .catch(err => console.log(err))
 
