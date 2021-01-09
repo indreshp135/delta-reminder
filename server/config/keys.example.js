@@ -3,5 +3,6 @@
 module.exports = {
     username: '',
     password: '',
-    fullString:''
+    fullString:'',
+    phone:''
 }

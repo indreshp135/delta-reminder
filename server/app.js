@@ -4,11 +4,16 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const app = express()
 const mongoose = require('mongoose')
+const request = require('request')
 
 const { User, Event } = require('./models/index.js')
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+var token = 'yrv0sigsq4oa5g3v';
+var instanceId = '214303/' //This will work only for 3 days
+var url = `https://api.chat-api.com/instance${instanceId}/message?token=${token}`;
 
 //CORS
 
@@ -29,7 +34,7 @@ const PORT = process.env.PORT || 8000
 
 const mongoKeys = require('./config/keys.js')
 
-mongoose.connect('mongodb+srv://Indresh:touchmate1@cluster0.lcnof.mongodb.net/events?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+mongoose.connect(mongoKeys.fullString, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
     .then(() => console.log("Connected to MongoDB"))
     .catch(err => console.log(err))
 
@@ -133,6 +138,19 @@ app.post('/event', async(req, res) => {
     const saved_event = await event.save()
     if (!saved_event.isPublic) {
         await User.findOneAndUpdate({ name: req.body.user }, { $push: { privateEvents: saved_event._id } })
+        var data = {
+            phone: mongoKeys.phone,
+            body: "*" + saved_event.name + "* \n\n" + saved_event.url + " \n\n" + saved_event.description,
+        };
+        request({
+            url: url,
+            method: "POST",
+            json: data
+        },(err,res,body)=>{
+            if(err)
+            console.error(err)           
+            else console.log(body)
+        })
     }
     res.send('sent')
 })
